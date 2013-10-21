@@ -31,11 +31,13 @@ class TestNewDoiQuery(unittest.TestCase):
 
     def test_new_doi_query(self):
         from .views import new_doi_query
+        from .models import Query
         request = testing.DummyRequest()
         request.POST = {'callback': 'http://foo.com/bar?id=1234',
                         'data': '{"foo": "baz"}'}
 
         self.assertIsInstance(new_doi_query(request), HTTPFound)
-        import pdb; pdb.set_trace()
-        self.assertEquals(DBSession.query(Query).one())
+        record = DBSession.query(Query).one()
+        self.assertEquals(record.callback_url, u'http://foo.com/bar?id=1234')
+        self.assertEquals(record.query_data, '{"foo": "baz"}')
 
