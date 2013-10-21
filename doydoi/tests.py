@@ -36,4 +36,6 @@ class TestNewDoiQuery(unittest.TestCase):
                         'data': '{"foo": "baz"}'}
 
         self.assertIsInstance(new_doi_query(request), HTTPFound)
+        import pdb; pdb.set_trace()
+        self.assertEquals(DBSession.query(Query).one())
 
