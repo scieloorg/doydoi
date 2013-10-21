@@ -36,10 +36,18 @@ class TestNewDoiQuery(unittest.TestCase):
 
         self.assertRaises(HTTPBadRequest, lambda: new_doi_query(request))
 
+    def test_missing_callback_id_returns_400(self):
+        from .views import new_doi_query
+        request = testing.DummyRequest()
+        request.POST = {'data': '{"foo": "baz"}',
+                        'callback': 'http://foo.com/bar/'}
+
+        self.assertRaises(HTTPBadRequest, lambda: new_doi_query(request))
+
     def test_missing_data_returns_400(self):
         from .views import new_doi_query
         request = testing.DummyRequest()
-        request.POST = {'callback': 'http://foo.com/bar?id=1234'}
+        request.POST = {'callback': 'http://foo.com/bar/'}
 
         self.assertRaises(HTTPBadRequest, lambda: new_doi_query(request))
 
@@ -47,11 +55,13 @@ class TestNewDoiQuery(unittest.TestCase):
         from .views import new_doi_query
         from .models import Query
         request = testing.DummyRequest()
-        request.POST = {'callback': 'http://foo.com/bar?id=1234',
+        request.POST = {'callback': 'http://foo.com/bar/',
+                        'callback_id': '1234',
                         'data': '{"foo": "baz"}'}
 
         self.assertIsInstance(new_doi_query(request), HTTPFound)
         record = DBSession.query(Query).one()
-        self.assertEquals(record.callback_url, u'http://foo.com/bar?id=1234')
+        self.assertEquals(record.callback_url, u'http://foo.com/bar/')
+        self.assertEquals(record.callback_id, '1234')
         self.assertEquals(record.query_data, '{"foo": "baz"}')
 

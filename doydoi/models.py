@@ -25,6 +25,7 @@ class Query(Base):
     __tablename__ = 'query'
     id = Column(Integer, primary_key=True)
     callback_url = Column(Text)
+    callback_id = Column(Text)
     query_data = Column(Text)
     issued_at = Column(DateTime)
 
