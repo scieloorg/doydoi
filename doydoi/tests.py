@@ -23,9 +23,23 @@ class TestNewDoiQuery(unittest.TestCase):
         DBSession.remove()
         testing.tearDown()
 
+    def test_missing_returns_400(self):
+        from .views import new_doi_query
+        request = testing.DummyRequest()
+
+        self.assertRaises(HTTPBadRequest, lambda: new_doi_query(request))
+
+    def test_missing_callback_returns_400(self):
+        from .views import new_doi_query
+        request = testing.DummyRequest()
+        request.POST = {'data': '{"foo": "baz"}'}
+
+        self.assertRaises(HTTPBadRequest, lambda: new_doi_query(request))
+
     def test_missing_data_returns_400(self):
         from .views import new_doi_query
         request = testing.DummyRequest()
+        request.POST = {'callback': 'http://foo.com/bar?id=1234'}
 
         self.assertRaises(HTTPBadRequest, lambda: new_doi_query(request))
 
